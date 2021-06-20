@@ -1,14 +1,10 @@
-FROM ubuntu:16.04
+FROM nvidia/cuda:11.1.1-cudnn8-devel-ubuntu18.04
 
 ########################################################
 # Essential packages for remote debugging and login in
 ########################################################
 
-RUN echo 'deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial main restricted universe multiverse' > /etc/apt/sources.list \
-    && echo 'deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-updates main restricted universe multiverse' >> /etc/apt/sources.list \
-    && echo 'deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-backports main restricted universe multiverse' >> /etc/apt/sources.list \
-    && echo 'deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ xenial-security main restricted universe multiverse' >> /etc/apt/sources.list \
-    && apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates openssh-server build-essential cmake gdb gdbserver git rsync \
     && rm -rf /var/lib/apt/lists/*
 
@@ -31,19 +27,9 @@ RUN echo 'debugger:pwd' | chpasswd
 ########################################################
 # Add custom packages and development environment here
 ########################################################
-# Install Google Test
-ENV GTEST_ROOT=/opt/googletest
-WORKDIR $GTEST_ROOT
-ENV CLONE_TAG=release-1.8.0
-RUN git clone -b ${CLONE_TAG} https://github.com/google/googletest.git . && \
-    mkdir build && cd build && cmake .. && make && make install
+# Install PyTorch
+RUN pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
 
-# Install OpenCV & Eigen3 & ffmpeg
-RUN apt-get update && apt-get install -y --no-install-recommends \
-				libopencv-dev \
-				libeigen3-dev \
-				ffmpeg && \
-		rm -rf /var/lib/apt/lists/*
 ########################################################
 
 CMD ["/usr/sbin/sshd", "-D"]
