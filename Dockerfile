@@ -5,7 +5,7 @@ FROM nvidia/cuda:11.1.1-cudnn8-devel-ubuntu18.04
 ########################################################
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates openssh-server build-essential cmake gdb gdbserver git rsync \
+    ca-certificates openssh-server build-essential cmake gdb gdbserver git rsync python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /var/run/sshd
@@ -28,7 +28,7 @@ RUN echo 'debugger:pwd' | chpasswd
 # Add custom packages and development environment here
 ########################################################
 # Install PyTorch
-RUN pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
+RUN pip3 install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html
 
 ########################################################
 
